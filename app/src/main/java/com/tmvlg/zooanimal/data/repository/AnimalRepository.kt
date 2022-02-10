@@ -1,6 +1,5 @@
 package com.tmvlg.zooanimal.data.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tmvlg.zooanimal.data.entities.Animal
@@ -8,7 +7,6 @@ import com.tmvlg.zooanimal.data.network.AnimalZooApi
 import com.tmvlg.zooanimal.data.network.models.AnimalResponse
 import retrofit2.Response
 import java.io.IOException
-import java.lang.RuntimeException
 
 object AnimalRepository {
 
@@ -24,8 +22,9 @@ object AnimalRepository {
 
     private val MAX_ATTEMPTS_COUNT = 2
 
+    private var sortable = false
+
     fun addAnimal() {
-        Log.d("1", "addAnimal: $otherAnimalList")
         if (otherAnimalList.isNotEmpty()) {
             while (true) {
                 val animal = otherAnimalList.random()
@@ -33,7 +32,11 @@ object AnimalRepository {
                     continue
                 }
                 animalList.add((0..animalList.size).random(), animal)
-                updateList()
+                if (sortable) {
+                    sortAnimals()
+                } else {
+                    updateList()
+                }
                 break
             }
         }
@@ -42,7 +45,6 @@ object AnimalRepository {
     fun addAnimalToOtherList(animal: Animal) {
         if (animal.id == Animal.UNDEFINED_ID)
             animal.id = autoIncrementId++
-        Log.d("1", "addAnimalToOtherList: $animal")
         otherAnimalList.add(animal)
     }
 
@@ -59,6 +61,23 @@ object AnimalRepository {
         return animalList.find { it.id == animalId }
             ?: throw RuntimeException("Animal with id = $animalId not found!")
     }
+
+    fun sortAnimals() {
+        animalList.sortWith { animal1, animal2 ->
+            val comparision =animal1.name.compareTo(animal2.name)
+            comparision.compareTo(0)
+        }
+        updateList()
+    }
+
+    fun setNeedToSort(boolean: Boolean) {
+        sortable = boolean
+    }
+
+    fun needToSort(): Boolean {
+        return sortable
+    }
+
 
     @Synchronized
     suspend fun loadAnimal() {
@@ -96,7 +115,6 @@ object AnimalRepository {
 
             } catch (t: Throwable) {
                 numberOfAttempt++
-                Log.d("1", "loadAnimal: numberOfAttempt #$numberOfAttempt")
                 exception.addSuppressed(t)
                 if (numberOfAttempt == 2) {
                     throw exception
@@ -106,7 +124,6 @@ object AnimalRepository {
 
 
         }
-        Log.d("1", "loadAnimal: $otherAnimalList")
     }
 
     private fun updateList() {
