@@ -1,7 +1,6 @@
 package com.tmvlg.zooanimal.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,6 @@ import com.squareup.picasso.Picasso
 import com.tmvlg.zooanimal.R
 import com.tmvlg.zooanimal.data.entities.Animal
 import com.tmvlg.zooanimal.databinding.AnimalDetailFragmentBinding
-import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance

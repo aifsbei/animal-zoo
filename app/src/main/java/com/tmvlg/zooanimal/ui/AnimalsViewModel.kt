@@ -1,13 +1,14 @@
 package com.tmvlg.zooanimal.ui
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tmvlg.zooanimal.data.entities.Animal
 import com.tmvlg.zooanimal.data.repository.AnimalRepository
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 class AnimalsViewModel(
@@ -31,7 +32,6 @@ class AnimalsViewModel(
 
             } catch (e: IOException) {
                 _loadingException.postValue(e)
-                Log.d("1", "startLoadingAnimals: _loadingException.value = ${_loadingException.value}")
             }
 
             delay(LOADING_DELAY_MS)
@@ -49,6 +49,22 @@ class AnimalsViewModel(
 
     fun removeAnimalFromList(animal: Animal) {
         repository.deleteAnimal(animal)
+    }
+
+    fun sortAnimalList() {
+        repository.sortAnimals()
+    }
+
+    fun setSortAnyTime() {
+        repository.setNeedToSort(true)
+    }
+
+    fun stopSortingAnyTime() {
+        repository.setNeedToSort(false)
+    }
+
+    fun isNeedToSort(): Boolean {
+        return repository.needToSort()
     }
 
     companion object {
