@@ -1,6 +1,7 @@
 package com.tmvlg.zooanimal
 
 import android.app.Application
+import com.tmvlg.zooanimal.data.local.db.AnimalsDB
 import com.tmvlg.zooanimal.data.repository.AnimalRepository
 import com.tmvlg.zooanimal.ui.AnimalDetailViewModelFactory
 import com.tmvlg.zooanimal.ui.AnimalsViewModelFactory
@@ -15,7 +16,9 @@ import org.kodein.di.generic.singleton
 class AnimalsApplication : Application(), KodeinAware {
     override val kodein: Kodein = Kodein.lazy{
         import(androidXModule(this@AnimalsApplication))
-        bind() from singleton { AnimalRepository }
+        bind() from singleton { AnimalsDB(instance()) }
+        bind() from singleton { AnimalsDB(instance()).animalDAO() }
+        bind() from singleton { AnimalRepository(instance()) }
         bind() from provider { AnimalsViewModelFactory(instance()) }
         bind() from provider { AnimalDetailViewModelFactory(instance()) }
     }
