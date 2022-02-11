@@ -71,6 +71,11 @@ class AnimalsViewModel(
     }
 
     fun saveSomeAnimals() = viewModelScope.launch(Dispatchers.IO) {
+
+        // make exception reusable
+        if (_loadingException.value != null)
+            _loadingException.postValue(null)
+
         repository.removeLocalAnimals()
         repository.load10Animals()
     }
