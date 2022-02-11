@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/animals_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.AnimalsFragment">
 
     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -11,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
         android:layout_marginTop="12dp"
-        android:text="Sort by name"
-        android:textSize="18sp"
+        android:layout_marginRight="24dp"
+        android:text="@string/sort_by_name"
         android:textColor="#2E4162"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
     </com.google.android.material.switchmaterial.SwitchMaterial>
 
@@ -27,11 +28,48 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toTopOf="@id/no_internet_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/switch_sort_method"
         tools:listitem="@layout/animal_list_item">
 
     </androidx.recyclerview.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/no_internet_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="12dp"
+            android:layout_weight="0.7"
+            android:text="@string/no_internet_connection"
+            android:textColor="#2E4162"
+            android:textSize="14sp">
+
+        </TextView>
+
+        <Button
+            android:id="@+id/retry_button"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.3"
+            android:text="@string/retry"
+            android:textColor="?attr/colorPrimary">
+
+        </Button>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

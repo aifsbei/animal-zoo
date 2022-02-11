@@ -8,4 +8,8 @@ interface AnimalZooApiService {
 
     @GET("animals/rand")
     fun getAnimal(): Call<AnimalResponse>
+
+    @GET("animals/rand/10")
+    fun get10Animals(): Call<List<AnimalResponse>>
+
 }

@@ -6,9 +6,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.tmvlg.zooanimal.data.entities.Animal
 import com.tmvlg.zooanimal.data.repository.AnimalRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.IOException
 
 class AnimalsViewModel(
@@ -20,31 +18,36 @@ class AnimalsViewModel(
     val loadingException = _loadingException.map { it }
 
     fun startLoadingAnimals() = viewModelScope.launch(Dispatchers.IO) {
-        while (_loadingException.value == null) {
-            try {
-//                val animal1 = async {repository.loadAnimal() }
-//                val animal2 = async {repository.loadAnimal() }
-//                animal1.await()
-//                animal2.await()
-                repeat(2) {
-                    repository.loadAnimal()
+        supervisorScope {
+            while (_loadingException.value == null) {
+                try {
+
+                    val animal1 = async {repository.loadAnimal() }
+                    val animal2 = async {repository.loadAnimal() }
+                    animal1.await()
+                    animal2.await()
+
+                } catch (e: IOException) {
+                    _loadingException.postValue(e)
                 }
 
-            } catch (e: IOException) {
-                _loadingException.postValue(e)
+                delay(LOADING_DELAY_MS)
             }
-
-            delay(LOADING_DELAY_MS)
         }
     }
 
 
     fun startShowingAnimal() = viewModelScope.launch {
         while (_loadingException.value == null) {
-            repository.addAnimal()
+            repository.selectAnimal()
             delay(APPEARING_DELAY_MS)
         }
 
+    }
+
+    fun startViewModelThreads() {
+        startLoadingAnimals()
+        startShowingAnimal()
     }
 
     fun removeAnimalFromList(animal: Animal) {
@@ -65,6 +68,19 @@ class AnimalsViewModel(
 
     fun isNeedToSort(): Boolean {
         return repository.needToSort()
+    }
+
+    fun saveSomeAnimals() = viewModelScope.launch(Dispatchers.IO) {
+        repository.removeLocalAnimals()
+        repository.load10Animals()
+    }
+
+    fun initOfflineMode() = viewModelScope.launch(Dispatchers.IO) {
+        repository.setSavedAnimals()
+    }
+
+    fun isAlreadyLoaded(): Boolean {
+        return repository.isListEmpty()
     }
 
     companion object {

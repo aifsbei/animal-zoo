@@ -2,16 +2,17 @@ package com.tmvlg.zooanimal.ui
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.tmvlg.zooanimal.R
 import com.tmvlg.zooanimal.databinding.AnimalsFragmentBinding
 import com.tmvlg.zooanimal.ui.animallist.AnimalListAdapter
+import com.tmvlg.zooanimal.util.isOnline
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -30,7 +31,6 @@ class AnimalsFragment : Fragment(), KodeinAware {
         get() = _binding ?: throw RuntimeException("null binding at $this")
 
     private lateinit var animalAdapter: AnimalListAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +65,17 @@ class AnimalsFragment : Fragment(), KodeinAware {
         binding.animalRv.adapter = animalAdapter
 
 
+
+        if (!requireContext().isOnline()) {
+            if (!viewModel.isAlreadyLoaded()) {
+                viewModel.initOfflineMode()
+            }
+            binding.noInternetLayout.visibility = View.VISIBLE
+        } else {
+            viewModel.saveSomeAnimals()
+//            viewModel.startViewModelThreads()
+        }
+
         binding.switchSortMethod.isChecked = viewModel.isNeedToSort()
 
         binding.switchSortMethod.setOnCheckedChangeListener { _, b ->
@@ -74,6 +85,12 @@ class AnimalsFragment : Fragment(), KodeinAware {
             } else {
                 viewModel.stopSortingAnyTime()
             }
+        }
+
+        binding.retryButton.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.main_container, AnimalsFragment.newInstance())
+                .commit()
         }
 
         animalAdapter.onAnimalItemClickListener = { animal ->
@@ -94,7 +111,9 @@ class AnimalsFragment : Fragment(), KodeinAware {
             animalAdapter.submitList(it)
         }
         viewModel.loadingException.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), "Loading Error!", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(requireContext(), "Loading Error!", Toast.LENGTH_SHORT).show()
+//            val contextView = requireActivity().findViewById<View>(R.id.animals_fragment_container)
+            binding.noInternetLayout.visibility = View.VISIBLE
         }
     }
 
